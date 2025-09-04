@@ -1,0 +1,331 @@
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Loan Approval Predictor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+  <h1 class="text-center mb-4">🏦 Loan Approval Predictor</h1>
+
+  <div class="card shadow p-4">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Age</label>
+          <input type="number" name="person_age" class="form-control" required>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Education</label>
+          <select name="person_education" class="form-control" required>
+            <option value="High School">High School</option>
+            <option value="Bachelor">Bachelor</option>
+            <option value="Master">Master</option>
+            <option value="PhD">PhD</option>
+          </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Annual Income</label>
+          <input type="number" name="person_income" class="form-control" required>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Employment Experience (Years)</label>
+          <input type="number" name="person_emp_exp" class="form-control" required>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Home Ownership</label>
+          <select name="person_home_ownership" class="form-control" required>
+            <option value="Rent">Rent</option>
+            <option value="Own">Own</option>
+            <option value="Mortgage">Mortgage</option>
+          </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Loan Amount</label>
+          <input type="number" name="loan_amnt" class="form-control" required>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Loan Intent</label>
+          <select name="loan_intent" class="form-control" required>
+            <option value="Education">Education</option>
+            <option value="Medical">Medical</option>
+            <option value="Venture">Venture</option>
+            <option value="Personal">Personal</option>
+            <option value="Home">Home</option>
+            <option value="Car">Car</option>
+          </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Credit History Length</label>
+          <input type="number" name="cb_person_cred_hist_length" class="form-control" required>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Credit Score</label>
+          <input type="number" name="credit_score" class="form-control" required>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Previous Loan Default?</label>
+          <select name="previous_loan_defaults_on_file" class="form-control" required>
+            <option value="No">No</option>
+            <option value="Yes">Yes</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 mt-3">Predict</button>
+    </form>
+  </div>
+
+  {% if result %}
+    <div class="alert alert-info text-center mt-4">
+      <h4>{{ result }}</h4>
+    </div>
+  {% endif %}
+
+  {% if error %}
+    <div class="alert alert-danger text-center mt-4">
+      <h5>{{ error }}</h5>
+    </div>
+  {% endif %}
+</div>
+
+</body>
+</html> {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Loan Approval Predictor</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa; /* Bootstrap's bg-light color */
+    }
+
+    /* Increased max-width for a wider layout */
+    .main-container {
+      max-width: 1000px; /* Increased from 800px */
+      margin: auto;
+    }
+
+    .predictor-card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
+      border-top: 5px solid #0d6efd;
+    }
+
+    .card-header-custom {
+      background-color: transparent;
+      border-bottom: 1px solid #eee;
+      padding: 1.5rem 2rem 1rem;
+    }
+
+    .card-header-custom h1 {
+      font-weight: 600;
+      font-size: 1.75rem;
+      color: #333;
+    }
+    
+    .card-header-custom p {
+        color: #6c757d;
+        margin-bottom: 0; /* Reduced margin */
+    }
+
+    .form-label {
+      font-weight: 500;
+      color: #555;
+      margin-bottom: .3rem; /* Slightly reduced label margin */
+    }
+
+    .form-control, .form-select {
+      border-radius: 8px;
+      padding: 0.6rem 1rem; /* Slightly reduced padding */
+      border: 1px solid #ddd;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.2);
+    }
+    
+    .input-group-text {
+        border-radius: 8px 0 0 8px;
+        background-color: #e9ecef;
+    }
+
+    .btn-predict {
+      font-weight: 600;
+      padding: 0.8rem;
+      border-radius: 8px;
+      background-image: linear-gradient(to right, #0d6efd, #0d65f0);
+      border: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-predict:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+    }
+    
+    .result-box {
+        border-radius: 15px;
+        padding: 1.5rem; /* Slightly reduced padding */
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .result-approved {
+        background-color: #d1e7dd; /* alert-success bg */
+        border-left: 8px solid #0f5132; /* alert-success border */
+        color: #0f5132;
+    }
+
+    .result-error, .result-rejected {
+        background-color: #f8d7da; /* alert-danger bg */
+        border-left: 8px solid #842029; /* alert-danger border */
+        color: #842029;
+    }
+    
+    .result-box h4 {
+        font-weight: 600;
+        font-size: 1.4rem; /* Slightly reduced font size */
+        margin: 0;
+    }
+
+  </style>
+</head>
+<body class="bg-light">
+
+<div class="container main-container py-5">
+  
+  <div class="card predictor-card">
+    <div class="card-header-custom">
+        <h1 class="text-center">🏦 Loan Approval Predictor</h1>
+        <p class="text-center text-muted">Fill in the details below to get a prediction.</p>
+    </div>
+    <div class="card-body p-4 p-md-5">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="row g-3"> 
+            <div class="col-md-6 col-lg-4"> 
+              <label class="form-label">Age</label>
+              <input type="number" name="person_age" class="form-control" placeholder="e.g., 35" required>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+              <label class="form-label">Highest Education</label>
+              <select name="person_education" class="form-select" required>
+                <option value="High School">High School</option>
+                <option value="Bachelor">Bachelor's</option>
+                <option value="Master">Master's</option>
+                <option value="PhD">PhD</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+              <label class="form-label">Annual Income</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" name="person_income" class="form-control" placeholder="e.g., 90000" required>
+              </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+              <label class="form-label">Employment Experience (Years)</label>
+              <input type="number" name="person_emp_exp" class="form-control" placeholder="e.g., 10" required>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+              <label class="form-label">Home Ownership</label>
+              <select name="person_home_ownership" class="form-select" required>
+                <option value="Rent">Rent</option>
+                <option value="Own">Own</option>
+                <option value="Mortgage">Mortgage</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+              <label class="form-label">Loan Amount</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input type="number" name="loan_amnt" class="form-control" placeholder="e.g., 25000" required>
+              </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+              <label class="form-label">Loan Intent</label>
+              <select name="loan_intent" class="form-select" required>
+                <option value="Personal">Personal</option>
+                <option value="Education">Education</option>
+                <option value="Medical">Medical</option>
+                <option value="Venture">Venture</option>
+                <option value="Home">Home Improvement</option>
+                <option value="Car">Car</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+              <label class="form-label">Credit History Length (Years)</label>
+              <input type="number" name="cb_person_cred_hist_length" class="form-control" placeholder="e.g., 8" required>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <label class="form-label">Credit Score</label>
+                <input type="number" name="credit_score" class="form-control" placeholder="e.g., 750" required>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <label class="form-label">Previous Loan Default?</label>
+                <select name="previous_loan_defaults_on_file" class="form-select" required>
+                  <option value="No">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 mt-4 btn-predict">
+            <i class="bi bi-graph-up-arrow"></i> Predict Approval
+          </button>
+        </form>
+    </div>
+  </div>
+
+  {% if result %}
+    <div class="result-box mt-4 {% if 'Approved' in result %}result-approved{% else %}result-rejected{% endif %}">
+      <h4>{{ result }}</h4>
+    </div>
+  {% endif %}
+
+  {% if error %}
+    <div class="result-box result-error mt-4">
+      <h4><i class="bi bi-exclamation-triangle-fill"></i> Error: {{ error }}</h4>
+    </div>
+  {% endif %}
+
+</div>
+
+</body>
+</html>
